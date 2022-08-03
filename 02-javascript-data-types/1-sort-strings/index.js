@@ -6,10 +6,11 @@
  */
 export function sortStrings(arr, param = 'asc') {
   let sortedArr = [...arr];
+
   switch(param) {
     case 'asc':
       sortedArr.sort((a,b) => {
-        return a.localeCompare(b, ['ru', 'en'], { caseFirst: 'upper' });  
+        return a.localeCompare(b, ['ru', 'en'], {caseFirst: 'upper'});  
       });
       break;
     case 'desc':
@@ -19,5 +20,6 @@ export function sortStrings(arr, param = 'asc') {
       break;
     default: break;  
   }
+
   return sortedArr;
 }
