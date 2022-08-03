@@ -5,5 +5,19 @@
  * @returns {string[]}
  */
 export function sortStrings(arr, param = 'asc') {
-
+  let sortedArr = [...arr];
+  switch(param) {
+    case 'asc':
+      sortedArr.sort((a,b) => {
+        return a.localeCompare(b, ['ru', 'en'], { caseFirst: 'upper' });  
+      });
+      break;
+    case 'desc':
+      sortedArr.sort((a,b) => {
+        return b.localeCompare(a, ['ru', 'en']);
+      });
+      break;
+    default: break;  
+  }
+  return sortedArr;
 }
