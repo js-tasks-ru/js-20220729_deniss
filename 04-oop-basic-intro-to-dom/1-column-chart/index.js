@@ -30,7 +30,7 @@ export default class ColumnChart {
   }
     
   getBarElementsAsString(barArray) {
-    return this.getNormalizeBarArray(barArray)
+    return this.getNormalizedBarArray(barArray)
     .map(normalizedValue => `<div style="--value: ${normalizedValue.value}" data-tooltip="${normalizedValue.percent}"></div>`)
     .join('');
   }
@@ -41,7 +41,7 @@ export default class ColumnChart {
       : "";
   }
     
-  getNormalizeBarArray(barArray) {
+  getNormalizedBarArray(barArray) {
     const maxValue = Math.max(...barArray);
     const scale = this.chartHeight / maxValue;
       
@@ -62,8 +62,6 @@ export default class ColumnChart {
       this.element.classList.remove("column-chart_loading");
       this.update(this.data);
     }
-
-    document.body.append(this.element);
   }
     
   update(data) {
