@@ -41,6 +41,8 @@ describe('oop-basic-intro-to-dom/column-chart', () => {
 
     const columnLink = columnChart.element.querySelector('.column-chart__link');
 
+    document.body.append(columnChart.element);
+
     expect(columnLink).toBeVisible();
   });
 
