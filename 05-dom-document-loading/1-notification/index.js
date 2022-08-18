@@ -3,8 +3,8 @@ export default class NotificationMessage {
   
   constructor(message = '', {duration = 2000, type = 'error'} = {}) {
     this.message = message;
-    this.duration = Number.isFinite(duration) ? duration : 2000;
-    this.type = (type === 'success') ? 'success' : 'error';
+    this.duration = duration;
+    this.type = type;
   
     this.render();
   }
