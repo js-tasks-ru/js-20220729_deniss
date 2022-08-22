@@ -11,7 +11,7 @@ export default class Tooltip {
     const elem = event.target.closest('[data-tooltip]');
     if(!elem) return;
 
-    let tooltip = elem.dataset.tooltip;
+    const tooltip = elem.dataset.tooltip;
     this.render(tooltip);
     document.addEventListener('pointermove', this.onTooltipPointerMove);
   }
@@ -26,6 +26,7 @@ export default class Tooltip {
     if(!elem) return;
 
     if(Tooltip.#instance) {
+      document.removeEventListener('pointermove', this.onTooltipPointerMove);
       this.remove();
     }
   }
@@ -48,12 +49,12 @@ export default class Tooltip {
 
   remove() {
     if (this.element) {
-      document.removeEventListener('pointermove', this.onTooltipPointerMove);
       this.element.remove();
     }
   }
 
   destroy() {
+    document.removeEventListener('pointermove', this.onTooltipPointerMove);
     document.removeEventListener('pointerover', this.onTooltipPointerOver);
     document.removeEventListener('pointerout', this.onTooltipPointerOut);
     this.remove();
