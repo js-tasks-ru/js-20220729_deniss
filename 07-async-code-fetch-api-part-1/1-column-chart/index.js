@@ -81,27 +81,24 @@ export default class ColumnChart {
   }
       
   async update(from, to) {
-    const url = new URL(`${BACKEND_URL}/${this.url}?from=${from.toISOString()}&to=${to.toISOString()}`);
+    const query = new URL(`${BACKEND_URL}/${this.url}?from=${from.toISOString()}&to=${to.toISOString()}`);
 
     try {
-      const response = await fetchJson(url.href);
+      this.element.classList.add("column-chart_loading");
+      const response = await fetchJson(query.href);
       const data = Object.values(response);
       this.updateReceivedData(data);
+      this.element.classList.remove("column-chart_loading");
       return response;
     } catch (error) {
-      throw new Error(`Unable to fetch data from ${url}`);
+      throw new Error(`Unable to fetch data from ${query}`);
     }
   }
 
   updateReceivedData(data) {
-    if(data.length) {
-      const value = data.reduce((acc,val) => acc += val, 0);
-      this.subElements.header.innerHTML = this.formatHeading(Number(value).toLocaleString('en-US'));
-      this.subElements.body.innerHTML = this.getBarElementsAsString(data);
-      this.element.classList.remove("column-chart_loading");
-    } else {
-      this.element.classList.add("column-chart_loading");
-    }
+    const value = data.reduce((acc,val) => acc += val, 0);
+    this.subElements.header.innerHTML = this.formatHeading(Number(value).toLocaleString('en-US'));
+    this.subElements.body.innerHTML = this.getBarElementsAsString(data);
   }
       
   remove() {
