@@ -81,7 +81,7 @@ export default class SortableList {
   render() {
       this.element = document.createElement("ul"),
       this.element.className = "sortable-list";
-      Object.values(this.items).map(listElement => this.addItem(listElement));
+      this.items.map(listElement => this.addItem(listElement));
   }
   
   InitEventListeners() {
