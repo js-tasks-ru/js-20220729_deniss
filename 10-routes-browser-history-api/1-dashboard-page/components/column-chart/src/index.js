@@ -19,10 +19,10 @@ export default class ColumnChart {
       
   getTemplate() {
     return `
-      <div class="column-chart column-chart_loading" style="--chart-height: 50">
+      <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
         <div class="column-chart__title">
           Total ${this.label}
-            ${this.getLink()}
+          ${this.getLink()}
         </div>
         <div class="column-chart__container">
           <div data-element="header" class="column-chart__header">
