@@ -32,7 +32,7 @@ describe('tests-for-frontend-apps/product-form-v2', () => {
   });
 
   it('should render categories data correctly', () => {
-    const subcategory = productFormComponent.element.querySelector('#subcategory');
+    const subcategory = productFormComponent.element.querySelector('[name="subcategory"]');
 
     function prepareCategoryName () {
       const names = [];
@@ -69,7 +69,7 @@ describe('tests-for-frontend-apps/product-form-v2', () => {
     const values = {};
 
     for (const field of fields) {
-      values[field] = productForm.querySelector(`#${field}`).value;
+      values[field] = productForm.querySelector(`[name="${field}"]`).value;
     }
 
     const imagesHTMLCollection = imageListContainer.querySelectorAll('.sortable-table__cell-img');

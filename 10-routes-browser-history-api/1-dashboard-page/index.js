@@ -3,8 +3,6 @@ import SortableTable from './components/sortable-table/src/index.js';
 import ColumnChart from './components/column-chart/src/index.js';
 import header from './bestsellers-header.js';
 
-const BACKEND_URL = 'https://course-js.javascript.ru/';
-
 export default class Page {
   element;
   subElements;
@@ -15,9 +13,7 @@ export default class Page {
     this.updateComponents(from, to);
   }
 
-  constructor() {
-    this.url = new URL('api/dashboard/bestsellers', BACKEND_URL);
-  }
+  constructor() {}
 
   get template() {
     return `
@@ -103,7 +99,7 @@ export default class Page {
     });
   }
 
-  async updateComponents(from, to) {
+  updateComponents(from, to) {
     Object.values(this.components).map(component => {
       if(component !== this.components.rangePicker) component.update(from.toISOString(), to.toISOString());
     });

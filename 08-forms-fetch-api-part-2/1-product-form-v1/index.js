@@ -32,8 +32,8 @@ export default class ProductForm {
     fileInput.type = "file",
     fileInput.accept = "image/*",
     fileInput.addEventListener('change', async (event) => {
-      const input =  event.path[0];
-      const image = input.files[0];
+      const [input] = event.path;
+      const [image] = input.files;
       if (!image) return;
   
       const imageFormData = new FormData();
