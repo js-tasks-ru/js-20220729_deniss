@@ -3,91 +3,21 @@ import fetchJson from '../../../utils/fetch-json.js';
 const BACKEND_URL = 'https://course-js.javascript.ru';
 
 export default class ColumnChart {
-  element;
-  subElements = {};
   chartHeight = 50;
+  subElements = {};
 
-  constructor({
-    label = '',
-    link = '',
-    formatHeading = data => data,
-    url = '',
-    range = {
-      from: new Date(),
-      to: new Date(),
-    }
-  } = {}) {
+  constructor({url = '', range = {from : new Date(), to : new Date()},
+               label = '', link = '', formatHeading = (data) => data} = {}) {
     this.url = new URL(url, BACKEND_URL);
     this.range = range;
     this.label = label;
     this.link = link;
     this.formatHeading = formatHeading;
-
+      
     this.render();
   }
-
-  render() {
-    const { from, to } = this.range;
-    const element = document.createElement('div');
-
-    element.innerHTML = this.template;
-
-    this.element = element.firstElementChild;
-    this.subElements = this.getSubElements(this.element);
-
-    this.loadData(from, to);
-  }
-
-  getHeaderValue(data) {
-    return this.formatHeading(Object.values(data).reduce((accum, item) => (accum + item), 0));
-  }
-
-  async loadData(from, to) {
-    this.element.classList.add('column-chart_loading');
-    this.subElements.header.textContent = '';
-    this.subElements.body.innerHTML = '';
-
-    this.url.searchParams.set('from', from.toISOString());
-    this.url.searchParams.set('to', to.toISOString());
-
-    const data = await fetchJson(this.url);
-
-    this.setNewRange(from, to);
-
-    if (data && Object.values(data).length) {
-      this.subElements.header.textContent = this.getHeaderValue(data);
-      this.subElements.body.innerHTML = this.getColumnBody(data);
-
-      this.element.classList.remove('column-chart_loading');
-    }
-  }
-
-  setNewRange(from, to) {
-    this.range.from = from;
-    this.range.to = to;
-  }
-
-  getColumnBody(data) {
-    const maxValue = Math.max(...Object.values(data));
-
-    return Object.entries(data).map(([key, value]) => {
-      const scale = this.chartHeight / maxValue;
-      const percent = (value / maxValue * 100).toFixed(0);
-      const tooltip = `<span>
-        <small>${key.toLocaleString('default', {dateStyle: 'medium'})}</small>
-        <br>
-        <strong>${percent}%</strong>
-      </span>`;
-
-      return `<div style="--value: ${Math.floor(value * scale)}" data-tooltip="${tooltip}"></div>`;
-    }).join('');
-  }
-
-  getLink() {
-    return this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
-  }
-
-  get template() {
+      
+  getTemplate() {
     return `
       <div class="column-chart column-chart_loading" style="--chart-height: ${this.chartHeight}">
         <div class="column-chart__title">
@@ -95,28 +25,93 @@ export default class ColumnChart {
           ${this.getLink()}
         </div>
         <div class="column-chart__container">
-          <div data-element="header" class="column-chart__header"></div>
-          <div data-element="body" class="column-chart__chart"></div>
+          <div data-element="header" class="column-chart__header">
+          </div>
+          <div data-element="body" class="column-chart__chart">
+          </div>
         </div>
       </div>
     `;
   }
+      
+  getBarElementsAsString(barArray) {
+    return this.getNormalizeBarArray(barArray)
+    .map(normalizedValue => `<div style="--value: ${normalizedValue.value}" data-tooltip="${normalizedValue.percent}"></div>`)
+    .join('');
+  }
+  
+  getLink() {
+    return this.link
+      ? `<a class="column-chart__link" href="${this.link}">View all</a>`
+      : "";
+  }
 
-  getSubElements(element) {
-    const elements = element.querySelectorAll('[data-element]');
+  getSubElements() {
+    const result = {};
+    const elements = this.element.querySelectorAll("[data-element]");
 
-    return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
+    for (const subElement of elements) {
+      const name = subElement.dataset.element;
 
-      return accum;
-    }, {});
+      result[name] = subElement;
+    }
+
+    return result;
+  }
+
+  getNormalizeBarArray(barArray) {
+    const maxValue = Math.max(...barArray);
+    const scale = this.chartHeight / maxValue;
+        
+    return barArray.map(item => {
+      return {
+        percent: (item / maxValue * 100).toFixed(0) + '%',
+        value: String(Math.floor(item * scale))
+      };
+    });
+  }
+          
+  render() {
+    const element = document.createElement("div");
+    element.innerHTML = this.getTemplate();
+    this.element = element.firstElementChild;
+    this.subElements = this.getSubElements();
+
+    this.update(this.range.from, this.range.to);
   }
 
   async update(from, to) {
-    return await this.loadData(from, to);
+    const query = new URL(this.url);
+    query.searchParams.set('from', from);
+    query.searchParams.set('to', to);
+
+    try {
+      this.element.classList.add("column-chart_loading");
+      const response = await fetchJson(query.href);
+      const data = Object.values(response);
+      this.updateReceivedData(data);
+      this.element.classList.remove("column-chart_loading");
+      return response;
+    } catch (error) {
+      throw new Error(`Unable to fetch data from ${query}`);
+    }
   }
 
+  updateReceivedData(data) {
+    const value = data.reduce((acc,val) => acc += val, 0);
+    this.subElements.header.innerHTML = this.formatHeading(Number(value).toLocaleString('en-US'));
+    this.subElements.body.innerHTML = this.getBarElementsAsString(data);
+  }
+      
+  remove() {
+    if(this.element) {
+      this.element.remove();  
+    }
+  }
+      
   destroy() {
-    this.element.remove();
+    this.remove();
+    this.subElements = {};
+    this.element = null;
   }
 }
